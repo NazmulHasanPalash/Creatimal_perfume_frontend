@@ -1,0 +1,42 @@
+.banner-style {
+    height: 100%;
+    width: 100%;
+    position: relative !important;
+    animation: bounce 10s infinite !important;
+}
+
+@keyframes bounce {
+    10% {
+        height: 100%;
+        width: 100%;
+    }
+
+    30% {
+        height: 100%;
+        width: 100%;
+    }
+
+    50% {
+        height: 100%;
+        width: 100%;
+        transform: translateY(40px);
+    }
+
+    75% {
+        height: 100%;
+        width: 100%;
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.display-style {
+    border: 2px solid white;
+    border-radius: 50px;
+}
+
+.c-image-style img {
+    height: 75%;
+}

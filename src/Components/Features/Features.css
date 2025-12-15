@@ -1,0 +1,236 @@
+/* ===== Layout wrapper ===== */
+.features-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 1.25rem;
+  box-sizing: border-box;
+}
+
+/* ===== Card base ===== */
+.features-card {
+  width: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+
+  border: none;
+  padding: 1px; /* subtle border glow */
+
+  /* Warm, premium gradient border */
+  background: radial-gradient(circle at top left, #fed7aa, #111827);
+  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.2);
+
+  animation: featuresFadeUp 720ms ease-out forwards;
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+/* Inner layout */
+.features-card .row {
+  margin: 0;
+}
+
+.features-content,
+.features-image-wrapper {
+  height: 100%;
+}
+
+/* Soft, minimal inner layer (glass-like) */
+.features-card > .row {
+  border-radius: 22px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 251, 235, 0.96),
+    rgba(248, 250, 252, 0.98)
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Hover lift */
+.features-card:hover {
+  box-shadow: 0 28px 75px rgba(15, 23, 42, 0.24);
+  transform: translateY(-6px);
+}
+
+/* ===== Text side ===== */
+.features-content {
+  padding: 2.3rem 2.4rem;
+  color: #111827;
+}
+
+/* Small label */
+.features-eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(15, 23, 42, 0.55);
+  display: inline-block;
+  margin-bottom: 0.35rem;
+}
+
+/* Sub heading */
+.features-kicker {
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(15, 23, 42, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+/* Main title */
+.features-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+  color: #0b1120;
+}
+
+/* Main body text */
+.features-text {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: rgba(30, 41, 59, 0.82);
+  margin-bottom: 0.9rem;
+}
+
+/* Smaller text block (bilingual section) */
+.features-text-small {
+  font-size: 0.85rem;
+  color: rgba(30, 41, 59, 0.78);
+}
+
+/* Feature chips row */
+.features-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.7rem 0 1rem;
+}
+
+/* Individual chip */
+.features-chip {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+
+  background: rgba(15, 23, 42, 0.04);
+  color: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ===== Image side ===== */
+.features-image-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.8rem 2rem;
+}
+
+/* Warm, soft gradient behind image */
+.features-image-shell {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #fef3c7, #fed7aa);
+  padding: 0.7rem;
+  max-width: 560px;
+  width: 100%;
+
+  animation: floatImage 5.4s ease-in-out infinite;
+}
+
+/* Bottle image */
+.features-image {
+  border-radius: 14px;
+  width: 100%;
+  object-fit: contain;
+  transform: scale(1.01);
+  transition: transform 800ms ease, filter 800ms ease;
+  filter: saturate(1.05) contrast(1.03);
+}
+
+/* Glow behind bottle */
+.features-image-glow {
+  position: absolute;
+  inset: 18%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(254, 243, 199, 0.95), transparent);
+  filter: blur(18px);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* Hover zoom and subtle clarity */
+.features-card:hover .features-image {
+  transform: scale(1.06);
+  filter: saturate(1.07) contrast(1.06);
+}
+
+/* ===== Animations ===== */
+@keyframes featuresFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.98);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Gentle floating animation for the image block */
+@keyframes floatImage {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-5px) translateX(3px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .features-content {
+    padding: 1.9rem 1.6rem 1.4rem;
+  }
+
+  .features-image-wrapper {
+    padding: 1.3rem 1.6rem 1.9rem;
+    justify-content: flex-start;
+  }
+
+  .features-image-shell {
+    max-width: 100%;
+  }
+
+  .features-title {
+    font-size: 1.35rem;
+  }
+
+  .features-chip-row {
+    gap: 0.35rem;
+  }
+
+  .features-chip {
+    font-size: 0.68rem;
+    padding: 0.3rem 0.8rem;
+  }
+}

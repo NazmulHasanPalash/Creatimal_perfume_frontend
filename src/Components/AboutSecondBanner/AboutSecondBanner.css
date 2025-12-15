@@ -1,0 +1,364 @@
+/* ============ Section Layout ============ */
+
+.about-second {
+  width: 100%;
+  padding: 4.5rem 1.5rem 3.8rem;
+  display: flex;
+  justify-content: center;
+  background: radial-gradient(
+    circle at top,
+    #fbe9e7 0%,
+    #fffaf7 40%,
+    #ffffff 100%
+  );
+}
+
+/* Main card with a soft glassy feel */
+.about-second-card {
+  position: relative;
+  width: 100%;
+  border-radius: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: about-second-enter 720ms ease-out both;
+}
+
+/* Soft premium glow in the background */
+.about-second-glow {
+  position: absolute;
+  inset: -35%;
+  background: radial-gradient(
+      circle at 18% 0%,
+      rgba(255, 214, 165, 0.65) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 88% 85%,
+      rgba(179, 136, 255, 0.45) 0%,
+      transparent 60%
+    );
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Inner two-column structure */
+.about-second-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr);
+  gap: 3.4rem;
+  padding: 2.9rem 3.1rem 3.1rem;
+  align-items: center;
+}
+
+/* ============ Left: Perfume Image ============ */
+
+.about-second-image-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-second-image-border {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  border-radius: 26px;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(188, 170, 164, 0.75)
+  );
+  box-shadow: 0 26px 58px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transform-origin: center;
+  animation: about-second-image-rise 720ms ease-out both 100ms;
+}
+
+/* Soft sheen across the frame */
+.about-second-image-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 8% 0%,
+      rgba(255, 255, 255, 0.28),
+      transparent 55%
+    ),
+    radial-gradient(circle at 100% 100%, rgba(0, 0, 0, 0.25), transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Main perfume image */
+.about-second-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 22px;
+  object-fit: cover;
+  transform-origin: center;
+  animation: about-second-float 8s ease-in-out infinite;
+}
+
+/* ============ Right: Text & Categories ============ */
+
+.about-second-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.about-second-title {
+  margin: 0;
+  font-size: clamp(2rem, 2.5vw, 2.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #1f1b1a;
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+}
+
+.about-second-text {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.8;
+  color: #6d5b55;
+  max-width: 500px;
+}
+
+.about-second-text-muted {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: #9b8378;
+  max-width: 500px;
+}
+
+/* Thin divider */
+.about-second-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, #c08a64, transparent);
+  margin: 0.4rem 0 0.6rem;
+  opacity: 0.8;
+}
+
+/* ============ Categories ============ */
+
+.about-second-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.about-second-categories-label {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a08679;
+}
+
+/* Grid wrapper (Bootstrap row is already applied) */
+.category-grid {
+  margin-top: 0.2rem;
+}
+
+/* Each category column wrapper */
+.category-card {
+  display: flex;
+  animation: about-second-category-fade 720ms ease-out both;
+}
+
+/* Staggered animation delays */
+.category-card:nth-child(1) {
+  animation-delay: 80ms;
+}
+.category-card:nth-child(2) {
+  animation-delay: 180ms;
+}
+.category-card:nth-child(3) {
+  animation-delay: 280ms;
+}
+.category-card:nth-child(4) {
+  animation-delay: 380ms;
+}
+
+/* Category card styling */
+.category-premium-card {
+  border-radius: 18px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: transform 220ms ease-out, box-shadow 220ms ease-out,
+    background 220ms ease-out;
+}
+
+/* Wrap each image in a subtle mask/frame */
+.category-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Category images */
+.category-image-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transform-origin: center;
+  transition: transform 260ms ease-out;
+}
+
+/* Card body refinement */
+.category-premium-card .card-body {
+  padding: 0.85rem 0.95rem 1rem;
+}
+
+/* Title & subtitle */
+.category-title {
+  margin: 0;
+  font-size: 1.95rem;
+  letter-spacing: 0.06em;
+  color: #f3a8a0;
+  font-weight: 600;
+}
+
+.category-subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: #a4897b;
+}
+
+/* Hover interactions for category cards */
+.category-premium-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.14);
+  background: radial-gradient(circle at top, #fffaf7 0%, #ffffff 65%);
+}
+
+.category-premium-card:hover .category-image-wrapper img {
+  transform: scale(1.05);
+}
+
+/* ============ Card Hover (global) ============ */
+
+.about-second-card {
+  transition: transform 260ms ease-out, box-shadow 260ms ease-out;
+}
+
+.about-second-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 85px rgba(0, 0, 0, 0.13);
+}
+
+.about-second-card:hover .about-second-image-border {
+  transform: translateY(-3px) scale(1.01);
+}
+
+/* ============ Animations ============ */
+
+@keyframes about-second-enter {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes about-second-image-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes about-second-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes about-second-category-fade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ Responsive ============ */
+
+@media (max-width: 992px) {
+  .about-second-inner {
+    grid-template-columns: 1fr;
+    gap: 2.6rem;
+    padding: 2.5rem 2.1rem 2.8rem;
+  }
+
+  .about-second-image-border {
+    max-width: 420px;
+  }
+
+  .about-second-content {
+    gap: 1.1rem;
+  }
+
+  .about-second-text,
+  .about-second-text-muted {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .about-second {
+    padding: 3.8rem 1.25rem 2.6rem;
+  }
+
+  .about-second-card {
+    border-radius: 22px;
+  }
+
+  .about-second-inner {
+    padding: 2.1rem 1.6rem 2.3rem;
+    gap: 2.1rem;
+  }
+
+  .about-second-title {
+    font-size: 1.8rem;
+  }
+
+  .about-second-image-border {
+    border-radius: 22px;
+  }
+
+  .about-second-image {
+    border-radius: 20px;
+  }
+
+  .category-premium-card {
+    border-radius: 16px;
+  }
+}

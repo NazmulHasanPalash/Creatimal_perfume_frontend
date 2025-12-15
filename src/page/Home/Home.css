@@ -1,0 +1,32 @@
+.home-page-heading-style {
+    text-align: center;
+    width: 45%;
+}
+
+
+
+.review-style {
+    border: solid 5px white;
+    border-radius: 30px;
+}
+
+.review-style img {
+    border: solid 5px white;
+    border-radius: 30px;
+    height: 150px;
+}
+
+.referances-style {
+    border: solid white;
+    border-radius: 20px;
+}
+
+.referances-style img {
+    border-radius: 20px;
+}
+
+.arrow-style {
+    background-color: green !important;
+    border-radius: 50px;
+
+}

@@ -1,0 +1,184 @@
+/* Outer wrapper to control max width and spacing */
+.first-banner-wrapper {
+  max-width: 1200px;
+  padding-inline: 1rem;
+  margin-top: 5.5rem; /* adjust if needed for fixed header */
+}
+
+/* Main carousel container */
+.first-banner {
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.2);
+}
+
+/* Ensure images cover nicely with subtle zoom */
+.first-banner-image-layer {
+  position: relative;
+  overflow: hidden;
+}
+
+.first-banner-image {
+  width: 100%;
+  height: clamp(260px, 60vh, 520px);
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 6s ease-out, filter 600ms ease;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+/* Zoom the current active image slightly */
+.carousel-item.active .first-banner-image {
+  transform: scale(1.08);
+}
+
+/* Dark gradient overlay for text readability */
+.first-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(15, 23, 42, 0.7),
+    rgba(15, 23, 42, 0.15),
+    rgba(0, 0, 0, 0)
+  );
+  display: flex;
+  align-items: center;
+}
+
+/* Caption container */
+.first-banner-caption {
+  max-width: 480px;
+  margin-left: min(7%, 4rem);
+  color: #f9fafb;
+  animation: bannerFadeUp 700ms ease-out forwards;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* Fade up when the slide is active */
+.carousel-item.active .first-banner-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Typography */
+.first-banner-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.first-banner-text {
+  font-size: 0.95rem;
+  max-width: 20rem;
+  line-height: 1.6;
+  color: rgba(249, 250, 251, 0.9);
+  margin-bottom: 1rem;
+}
+
+/* CTA button */
+.first-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+
+  border-radius: 999px;
+  padding: 0.45rem 1.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+
+  background: #f9fafb;
+  color: #111827;
+  border: 1px solid transparent;
+
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.55);
+  cursor: pointer;
+  transition: all 180ms ease-out;
+}
+
+.first-banner-btn:hover {
+  background: transparent;
+  color: #f9fafb;
+  border-color: #f9fafb;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.7);
+}
+
+/* Controls */
+.first-banner-control {
+  width: auto;
+}
+
+.first-banner-control-icon {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 999px;
+  background-color: rgba(15, 23, 42, 0.7);
+  background-size: 50% 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.6);
+}
+
+.carousel-control-prev-icon.first-banner-control-icon,
+.carousel-control-next-icon.first-banner-control-icon {
+  filter: invert(1);
+}
+
+/* Indicators (dots) */
+.first-banner-indicators {
+  bottom: 1.1rem;
+  margin-bottom: 0;
+}
+
+.first-banner-indicators button {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: none;
+  background-color: rgba(248, 250, 252, 0.6);
+  margin: 0 4px;
+  transition: all 160ms ease-out;
+}
+
+.first-banner-indicators .active {
+  width: 18px;
+  background-color: #f9fafb;
+}
+
+/* Animation keyframes */
+@keyframes bannerFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .first-banner-caption {
+    margin-left: 1.4rem;
+    margin-right: 1.4rem;
+    max-width: 100%;
+  }
+
+  .first-banner-text {
+    max-width: 100%;
+  }
+
+  .first-banner-image {
+    height: clamp(220px, 50vh, 380px);
+  }
+}

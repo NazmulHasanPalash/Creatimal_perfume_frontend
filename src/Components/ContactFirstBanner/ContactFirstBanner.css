@@ -1,0 +1,297 @@
+/* ========== Wrapper ========== */
+
+.contact-first-banner-wrapper {
+  width: 100%;
+  padding: 3.5rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  background: radial-gradient(
+    circle at top,
+    #fbe9e7 0%,
+    #fffaf7 40%,
+    #ffffff 100%
+  );
+}
+
+/* ========== Card Base ========== */
+
+.contact-first-banner-card {
+  position: relative;
+  width: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  border: none;
+  background-color: #0b0706;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
+  transform-origin: center;
+  animation: contact-banner-appear 520ms ease-out both;
+}
+
+/* Premium soft glow overlay inside card */
+
+.contact-first-banner-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 0% 0%,
+      rgba(248, 211, 195, 0.5) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 90% 100%,
+      rgba(130, 86, 61, 0.75) 0%,
+      transparent 60%
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hover lift */
+
+.contact-first-banner-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+}
+
+/* ========== Image ========== */
+
+.contact-first-banner-image {
+  height: 700px;
+  object-fit: cover;
+  filter: saturate(1.15) contrast(1.08);
+  transform-origin: center;
+  animation: contact-banner-image-zoom 12s ease-in-out infinite alternate;
+}
+
+/* ========== Overlay Content ========== */
+
+.contact-first-banner-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 2.4rem 2.8rem;
+  z-index: 2;
+}
+
+.contact-first-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  color: #fdf7f3;
+  animation: contact-banner-content-rise 620ms ease-out both 80ms;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+}
+
+/* Tiny chip label */
+
+.contact-first-banner-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.24rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ffe9d6;
+  background: rgba(12, 7, 6, 0.85);
+  border: 1px solid rgba(252, 226, 207, 0.6);
+  backdrop-filter: blur(14px);
+}
+
+/* Chip glowing edge on hover */
+
+.contact-first-banner-card:hover .contact-first-banner-chip {
+  box-shadow: 0 0 16px rgba(248, 211, 195, 0.9);
+}
+
+/* Title */
+
+.contact-first-banner-title {
+  margin: 0;
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fdf3e7;
+  position: relative;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+}
+
+/* Thin underline accent */
+
+.contact-first-banner-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.4rem;
+  width: 84px;
+  height: 1px;
+  background: linear-gradient(90deg, #f7cda1, transparent);
+  opacity: 0.95;
+  transform-origin: left;
+  animation: contact-banner-underline 520ms ease-out both 150ms;
+}
+
+/* Description text */
+
+.contact-first-banner-text {
+  margin-top: 1.3rem;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
+  line-height: 1.95;
+  color: #f5e2d3;
+  max-width: 430px;
+  letter-spacing: 0.01em;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.65);
+}
+
+/* CTA Button */
+
+.contact-first-banner-cta {
+  align-self: flex-start;
+  margin-top: 0.4rem;
+  padding: 0.7rem 1.8rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.92rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  outline: none;
+  color: #20100a;
+  background: linear-gradient(135deg, #f5c19d 0%, #fbe3d0 40%, #f3b78a 100%);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+  transform-origin: center;
+  transition: transform 180ms ease-out, box-shadow 180ms ease-out,
+    background 220ms ease-out;
+}
+
+.contact-first-banner-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.75);
+  background: linear-gradient(135deg, #f8caa8 0%, #ffe9d5 45%, #f2b07f 100%);
+}
+
+.contact-first-banner-cta:active {
+  transform: translateY(0);
+  box-shadow: 0 9px 22px rgba(0, 0, 0, 0.6);
+}
+
+/* ========== Animations ========== */
+
+@keyframes contact-banner-appear {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes contact-banner-image-zoom {
+  0% {
+    transform: scale(1.02) translateY(0);
+  }
+  50% {
+    transform: scale(1.08) translateY(-6px);
+  }
+  100% {
+    transform: scale(1.05) translateY(0);
+  }
+}
+
+@keyframes contact-banner-content-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes contact-banner-underline {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* ========== Responsive ========== */
+
+@media (max-width: 992px) {
+  .contact-first-banner-image {
+    height: 320px;
+  }
+
+  .contact-first-banner-overlay {
+    padding: 2.1rem 2rem;
+  }
+
+  .contact-first-banner-title {
+    font-size: 1.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-first-banner-wrapper {
+    padding: 3rem 1.25rem;
+  }
+
+  .contact-first-banner-overlay {
+    align-items: flex-end;
+    padding: 1.8rem 1.6rem;
+    background: linear-gradient(
+      to top,
+      rgba(6, 4, 4, 0.9) 0%,
+      rgba(6, 4, 4, 0.78) 35%,
+      transparent 100%
+    );
+  }
+
+  .contact-first-banner-content {
+    max-width: 100%;
+  }
+
+  .contact-first-banner-title {
+    font-size: 1.7rem;
+  }
+
+  .contact-first-banner-text {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .contact-first-banner-wrapper {
+    padding: 2.5rem 1.1rem;
+  }
+
+  .contact-first-banner-image {
+    height: 280px;
+  }
+
+  .contact-first-banner-overlay {
+    padding: 1.6rem 1.3rem;
+  }
+
+  .contact-first-banner-chip {
+    font-size: 0.7rem;
+  }
+
+  .contact-first-banner-title {
+    font-size: 1.55rem;
+  }
+}

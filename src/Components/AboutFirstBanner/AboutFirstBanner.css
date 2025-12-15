@@ -1,0 +1,190 @@
+/* ============ Outer Section ============ */
+
+.about-banner {
+  width: 100%;
+  padding: 6rem 1.5rem 3.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(
+    circle at top,
+    #fbe9e7 0%,
+    #fffaf7 40%,
+    #ffffff 100%
+  );
+}
+
+/* Main card with glassy / premium feel */
+.about-banner-card {
+  position: relative;
+  width: 100%;
+  border-radius: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: about-banner-enter 700ms ease-out both;
+}
+
+/* Soft colored glow behind the card */
+.about-banner-glow {
+  position: absolute;
+  inset: -35%;
+  background: radial-gradient(
+      circle at 16% 0%,
+      rgba(255, 214, 165, 0.65) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(179, 136, 255, 0.4) 0%,
+      transparent 55%
+    );
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============ Image Shell ============ */
+
+.about-banner-image-shell {
+  padding: 3rem 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Gradient border frame around image */
+.about-banner-image-border {
+  position: relative;
+  width: 100%;
+  border-radius: 26px;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(188, 170, 164, 0.7)
+  );
+  box-shadow: 0 26px 55px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transform-origin: center;
+  animation: about-banner-image-rise 700ms ease-out both 120ms;
+}
+
+/* Subtle inner sheen for premium effect */
+.about-banner-image-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 8% 0%,
+      rgba(255, 255, 255, 0.26),
+      transparent 55%
+    ),
+    radial-gradient(circle at 100% 100%, rgba(0, 0, 0, 0.25), transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Main image */
+.about-banner-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+  object-fit: cover;
+  animation: about-banner-float 7s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ============ Hover Interactions ============ */
+
+.about-banner-card {
+  transition: transform 260ms ease-out, box-shadow 260ms ease-out;
+}
+
+.about-banner-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 85px rgba(0, 0, 0, 0.14);
+}
+
+.about-banner-card:hover .about-banner-image-border {
+  transform: translateY(-3px) scale(1.01);
+}
+
+/* Optional: slightly stronger hover on image itself */
+.about-banner-card:hover .about-banner-image {
+  transform: translateY(-4px);
+}
+
+/* ============ Animations ============ */
+
+@keyframes about-banner-enter {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes about-banner-image-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes about-banner-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ============ Responsive ============ */
+
+@media (max-width: 992px) {
+  .about-banner-image-shell {
+    padding: 2.5rem 2rem;
+  }
+
+  .about-banner-image-border {
+    max-width: 540px;
+  }
+}
+
+@media (max-width: 576px) {
+  .about-banner {
+    padding: 4.8rem 1.25rem 2.6rem;
+  }
+
+  .about-banner-card {
+    border-radius: 22px;
+  }
+
+  .about-banner-image-shell {
+    padding: 2rem 1.4rem 2.2rem;
+  }
+
+  .about-banner-image-border {
+    border-radius: 20px;
+  }
+
+  .about-banner-image {
+    border-radius: 18px;
+  }
+}

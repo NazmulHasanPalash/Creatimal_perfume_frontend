@@ -1,0 +1,43 @@
+.second-banner-style {
+    background-color: #46afef;
+    background-repeat: no-repeat !important;
+
+    width: 100%;
+    height: 700px;
+    background-size: 100%;
+
+}
+
+.body-style {
+    text-align: right !important;
+}
+
+.contact-style a {
+    text-decoration: none;
+    color: black;
+}
+
+.contact-style {
+    background-color: white !important;
+    border-radius: 40px;
+}
+
+.tag-style {
+    color: darkblue !important;
+}
+
+.span-style {
+    color: navy !important;
+}
+
+.type-style {
+    color: navy;
+}
+
+.banner-text-style {
+    color: white;
+}
+
+.second_banner_paragraph {
+    text-align: justify;
+}
