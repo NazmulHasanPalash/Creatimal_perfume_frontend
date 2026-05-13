@@ -1,13 +1,11 @@
-// DisplayProducts.js
-import React, { useEffect, useMemo, useState } from 'react';
+// src/pages/DisplayProducts/DisplayProducts.js  (ADMIN-ONLY DELETE - FULL FIXED)
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import './DisplayProducts.css';
 
-// If Bootstrap is not imported globally in index.js/App.js, uncomment:
-// import 'bootstrap/dist/css/bootstrap.min.css';
-
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://creatimal-charmon-perfume-backend.vercel.app';
 
 /* ---------------- Helpers ---------------- */
 function safeStr(v) {
@@ -17,7 +15,6 @@ function safeStr(v) {
 function getId(p) {
   const id = p?._id;
 
-  // Normal: string
   if (typeof id === 'string') return id;
 
   // Extended JSON: { $oid: "..." }
@@ -46,6 +43,7 @@ function getImageSrc(p) {
 
   const s = safeStr(raw).trim();
 
+  if (!s) return '';
   if (s.startsWith('data:image/')) return s;
   if (/^https?:\/\//i.test(s)) return s;
 
@@ -82,7 +80,7 @@ function getQuantityMlDisplay(p) {
 
   // fallback to quantity if ml not found
   const q = safeStr(p?.quantity).trim();
-  return q ? `${q} ml` : '—';
+  return q ? `${q}` : '—';
 }
 
 /* ---------------- Axios ---------------- */
@@ -94,6 +92,13 @@ const api = axios.create({
 export default function DisplayProducts() {
   const history = useHistory();
 
+  // auth/admin
+  const [authReady, setAuthReady] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminChecking, setAdminChecking] = useState(false);
+  const tokenRef = useRef('');
+
+  // products
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -103,10 +108,77 @@ export default function DisplayProducts() {
   // Search
   const [search, setSearch] = useState('');
 
-  // Selection
+  // Selection (admin only UI)
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [deleting, setDeleting] = useState(false);
 
+  /* =========================
+     Auth token + Admin check
+     ========================= */
+  useEffect(() => {
+    const auth = getAuth();
+
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      try {
+        setAuthReady(false);
+        setIsAdmin(false);
+        tokenRef.current = '';
+
+        if (!user) {
+          setAuthReady(true);
+          setIsAdmin(false);
+          return;
+        }
+
+        const token = await user.getIdToken();
+        tokenRef.current = safeStr(token).trim();
+        setAuthReady(true);
+
+        // Admin verification (calls admin-only endpoint)
+        await checkIsAdmin();
+      } catch (e) {
+        console.error('Auth error:', e);
+        tokenRef.current = '';
+        setAuthReady(true);
+        setIsAdmin(false);
+      }
+    });
+
+    return () => unsub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function getAuthHeadersOrThrow() {
+    const token = safeStr(tokenRef.current).trim();
+    if (!token) throw new Error('Missing Authorization token. Please login.');
+    return { Authorization: `Bearer ${token}` };
+  }
+
+  async function checkIsAdmin() {
+    const token = safeStr(tokenRef.current).trim();
+    if (!token) {
+      setIsAdmin(false);
+      return false;
+    }
+
+    setAdminChecking(true);
+    try {
+      // /admins is protected by requireAuth + requireAdmin
+      await api.get('/admins', { headers: getAuthHeadersOrThrow() });
+      setIsAdmin(true);
+      return true;
+    } catch (err) {
+      // 401/403 means not admin or token invalid
+      setIsAdmin(false);
+      return false;
+    } finally {
+      setAdminChecking(false);
+    }
+  }
+
+  /* =========================
+     Products fetch
+     ========================= */
   async function fetchProducts() {
     setLoading(true);
     setError('');
@@ -123,6 +195,8 @@ export default function DisplayProducts() {
       });
 
       setProducts(arr);
+
+      // Clear selection if not admin or refresh
       setSelectedIds(new Set());
     } catch (e) {
       console.error('DisplayProducts fetch error:', e);
@@ -150,7 +224,6 @@ export default function DisplayProducts() {
       const name = safeStr(p?.name).toLowerCase();
       const desc = safeStr(p?.description).toLowerCase();
 
-      // include ml fields into search
       const qtyMl = safeStr(
         p?.availableMl ??
           p?.availableML ??
@@ -177,10 +250,13 @@ export default function DisplayProducts() {
 
   const count = useMemo(() => filteredProducts.length, [filteredProducts]);
 
-  // Selection helpers
+  /* =========================
+     Admin-only selection helpers
+     ========================= */
   const isSelected = (id) => selectedIds.has(id);
 
   function toggleSelected(id) {
+    if (!isAdmin) return;
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -194,6 +270,7 @@ export default function DisplayProducts() {
   }
 
   function selectAllFiltered() {
+    if (!isAdmin) return;
     setSelectedIds(() => {
       const next = new Set();
       filteredProducts.forEach((p) => next.add(getId(p)));
@@ -202,6 +279,11 @@ export default function DisplayProducts() {
   }
 
   async function deleteSelected() {
+    if (!isAdmin) {
+      setError('Access denied. Admin only.');
+      return;
+    }
+
     const ids = Array.from(selectedIds || []);
     if (ids.length === 0) return;
 
@@ -213,9 +295,11 @@ export default function DisplayProducts() {
 
     setDeleting(true);
     try {
+      const headers = getAuthHeadersOrThrow();
+
       for (const id of ids) {
         // eslint-disable-next-line no-await-in-loop
-        await api.delete(`/products/${id}`);
+        await api.delete(`/products/${encodeURIComponent(id)}`, { headers });
       }
 
       setProducts((prev) => prev.filter((p) => !selectedIds.has(getId(p))));
@@ -234,7 +318,6 @@ export default function DisplayProducts() {
   }
 
   function goToBuyProduct(productId) {
-    // ✅ Redirect to BuyProduct page with product id
     history.push(`/buyProduct/${encodeURIComponent(productId)}`);
   }
 
@@ -245,8 +328,7 @@ export default function DisplayProducts() {
         <h1 className="category-title">Best Products</h1>
         <h2 className="fregnance-title">Best Sellers Products</h2>
         <p className="description-style">
-          The stylish and organized perfume products crafted for every mood and
-          moment.
+          The stylish and organized perfume products crafted for every mood and moment.
         </p>
 
         {/* Toolbar */}
@@ -276,43 +358,54 @@ export default function DisplayProducts() {
           </div>
         </div>
 
-        {/* Selection Bar */}
-        <div className="dp-selectbar">
-          <div className="dp-select-left">
-            <span className="dp-selected-pill">
-              Selected: {selectedIds.size}
-            </span>
-
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={selectAllFiltered}
-              disabled={loading || filteredProducts.length === 0}
-            >
-              Select All
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={clearSelection}
-              disabled={selectedIds.size === 0}
-            >
-              Clear
-            </button>
-          </div>
-
-          <div className="dp-select-right">
-            <button
-              type="button"
-              className="btn btn-danger btn-sm"
-              onClick={deleteSelected}
-              disabled={selectedIds.size === 0 || deleting}
-            >
-              {deleting ? 'Deleting...' : 'Delete Selected'}
-            </button>
-          </div>
+        {/* ✅ Admin status hint (optional, safe) */}
+        <div style={{ marginBottom: 10, fontSize: 13, opacity: 0.8 }}>
+          {adminChecking
+            ? 'Checking admin…'
+            : authReady
+              ? isAdmin
+                ? 'Admin mode: delete enabled'
+                : 'User mode'
+              : 'Checking login…'}
         </div>
+
+        {/* ✅ Selection Bar (ADMIN ONLY) */}
+        {isAdmin ? (
+          <div className="dp-selectbar">
+            <div className="dp-select-left">
+              <span className="dp-selected-pill">Selected: {selectedIds.size}</span>
+
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={selectAllFiltered}
+                disabled={loading || filteredProducts.length === 0}
+              >
+                Select All
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={clearSelection}
+                disabled={selectedIds.size === 0}
+              >
+                Clear
+              </button>
+            </div>
+
+            <div className="dp-select-right">
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                onClick={deleteSelected}
+                disabled={selectedIds.size === 0 || deleting}
+              >
+                {deleting ? 'Deleting...' : 'Delete Selected'}
+              </button>
+            </div>
+          </div>
+        ) : null}
 
         {/* Alerts */}
         {error ? (
@@ -345,15 +438,17 @@ export default function DisplayProducts() {
                 <div key={id} className="col product-card">
                   <article className="card premium-card h-100">
                     <div className="image-wrapper">
-                      {/* Checkbox */}
-                      <label className="dp-check" title="Select">
-                        <input
-                          type="checkbox"
-                          checked={isSelected(id)}
-                          onChange={() => toggleSelected(id)}
-                        />
-                        <span className="dp-check-ui" />
-                      </label>
+                      {/* ✅ Checkbox ONLY for admin */}
+                      {isAdmin ? (
+                        <label className="dp-check" title="Select">
+                          <input
+                            type="checkbox"
+                            checked={isSelected(id)}
+                            onChange={() => toggleSelected(id)}
+                          />
+                          <span className="dp-check-ui" />
+                        </label>
+                      ) : null}
 
                       {imgSrc ? (
                         <img
@@ -368,17 +463,12 @@ export default function DisplayProducts() {
                     </div>
 
                     <div className="card-body d-flex flex-column">
-                      <h5 className="card-title">
-                        {safeStr(p?.name) || 'Untitled'}
-                      </h5>
+                      <h5 className="card-title">{safeStr(p?.name) || 'Untitled'}</h5>
                       <p className="card-text">{safeStr(p?.description)}</p>
 
                       <div className="product-meta mt-auto">
-                        {/* ✅ quantity in ML */}
-                        <span className="product-quantity">{qtyMlText}</span>
-                        <span className="product-price">
-                          {formatPrice(p?.price)}
-                        </span>
+                        <span className="product-quantity">{qtyMlText} ml</span>
+                        <span className="product-price">{formatPrice(p?.price)}</span>
                       </div>
 
                       <div className="dp-card-actions">

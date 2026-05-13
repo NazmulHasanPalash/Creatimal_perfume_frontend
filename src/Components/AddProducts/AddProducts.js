@@ -1,11 +1,17 @@
-// AddProducts.js
-import React, { useMemo, useState } from 'react';
+// src/pages/AddProducts/AddProducts.js  (React Router DOM v5 - FULL FIXED)
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useHistory } from 'react-router-dom';
 import './AddProducts.css';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://creatimal-charmon-perfume-backend.vercel.app';
 
-// ---------- helpers ----------
+/* ---------- helpers ---------- */
+function safeStr(v) {
+  return v === null || v === undefined ? '' : String(v);
+}
+
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
     if (!file) return reject(new Error('No file provided.'));
@@ -16,17 +22,20 @@ function fileToDataUrl(file) {
   });
 }
 
-function safeStr(v) {
-  return v === null || v === undefined ? '' : String(v);
-}
-
 // axios instance
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 20000,
 });
 
-const AddProducts = () => {
+export default function AddProducts() {
+  const history = useHistory();
+
+  // auth state
+  const [authReady, setAuthReady] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const tokenRef = useRef('');
+
   // form state
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -40,26 +49,75 @@ const AddProducts = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  /* =========================
+     Firebase token (Admin must be logged in)
+     ========================= */
+  useEffect(() => {
+    const auth = getAuth();
+
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      try {
+        if (!user) {
+          tokenRef.current = '';
+          setUserEmail('');
+          setAuthReady(true);
+          setError('You are not logged in. Please login as admin.');
+          return;
+        }
+
+        const token = await user.getIdToken();
+        tokenRef.current = safeStr(token).trim();
+        setUserEmail(safeStr(user.email).trim());
+        setAuthReady(true);
+
+        if (!tokenRef.current) {
+          setError('Login token missing. Please logout and login again.');
+        } else {
+          setError('');
+        }
+      } catch (e) {
+        console.error('Auth token error:', e);
+        tokenRef.current = '';
+        setUserEmail('');
+        setAuthReady(true);
+        setError('Failed to get login token. Please login again.');
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  function getAuthHeadersOrThrow() {
+    const token = safeStr(tokenRef.current).trim();
+    if (!token) throw new Error('Missing Authorization token. Please login as admin.');
+    return { Authorization: `Bearer ${token}` };
+  }
+
   const canSubmit = useMemo(() => {
     return (
+      authReady &&
+      !!safeStr(tokenRef.current).trim() &&
       name.trim() &&
       description.trim() &&
       safeStr(price).trim() &&
       safeStr(quantity).trim() &&
-      imageFile &&
+      !!imageFile &&
       !submitting
     );
-  }, [name, description, price, quantity, imageFile, submitting]);
+  }, [authReady, name, description, price, quantity, imageFile, submitting]);
 
-  function resetForm() {
+  function resetForm({ keepMessages = false } = {}) {
     setName('');
     setPrice('');
     setQuantity('');
     setDescription('');
     setImageFile(null);
     setImagePreview('');
-    setError('');
-    setSuccess('');
+
+    if (!keepMessages) {
+      setError('');
+      setSuccess('');
+    }
 
     const fileInput = document.getElementById('product-image-input');
     if (fileInput) fileInput.value = '';
@@ -68,8 +126,8 @@ const AddProducts = () => {
   async function handleImageChange(e) {
     const file = e.target.files?.[0] || null;
     setImageFile(file);
-    setError('');
     setSuccess('');
+    setError('');
 
     if (!file) {
       setImagePreview('');
@@ -93,22 +151,25 @@ const AddProducts = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (submitting) return;
+
     setError('');
     setSuccess('');
 
-    const priceNum = Number(price);
-
-    if (!name.trim()) return setError('Product name is required.');
-    if (!description.trim()) return setError('Description is required.');
-    if (!safeStr(quantity).trim()) return setError('Quantity is required (e.g., 30 ml).');
-    if (!price || Number.isNaN(priceNum) || priceNum <= 0) {
-      return setError('Price must be a number greater than 0.');
-    }
-    if (!imageFile) return setError('Please choose a product image.');
-
-    setSubmitting(true);
     try {
-      // convert image to base64
+      const headers = getAuthHeadersOrThrow();
+      const priceNum = Number(price);
+
+      if (!name.trim()) return setError('Product name is required.');
+      if (!description.trim()) return setError('Description is required.');
+      if (!safeStr(quantity).trim()) return setError('Quantity is required (e.g., 30 ml).');
+      if (!price || Number.isNaN(priceNum) || priceNum <= 0) {
+        return setError('Price must be a number greater than 0.');
+      }
+      if (!imageFile) return setError('Please choose a product image.');
+
+      setSubmitting(true);
+
       const imageUrl = await fileToDataUrl(imageFile);
 
       const payload = {
@@ -119,17 +180,32 @@ const AddProducts = () => {
         imageUrl,
       };
 
-      await api.post('/products', payload);
+      await api.post('/products', payload, { headers });
 
+      // ✅ show message + reset inputs (keep success)
       setSuccess('✅ Product added successfully!');
-      resetForm();
+      resetForm({ keepMessages: true });
+
+      // ✅ redirect to "/products" (HashRouter or BrowserRouter both OK)
+      // If you want a small delay so user sees success, keep setTimeout.
+      setTimeout(() => {
+        history.push('/products');
+      }, 300);
     } catch (err) {
       console.error('submit error:', err);
+
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         'Failed to add product.';
-      setError(msg);
+
+      if (String(msg).toLowerCase().includes('admin')) {
+        setError('Access denied. Admin only.');
+      } else if (String(msg).toLowerCase().includes('authorization')) {
+        setError('You are not logged in. Please login as admin.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -140,16 +216,25 @@ const AddProducts = () => {
       <div className="add-products-shell">
         <header className="add-products-header">
           <h2 className="add-products-title">Add Products</h2>
-         
+
+          <div className="add-products-hint">
+            {authReady
+              ? userEmail
+                ? `Logged in: ${userEmail}`
+                : 'Not logged in'
+              : 'Checking login…'}
+          </div>
         </header>
 
         {error ? <div className="alert alert-error">{error}</div> : null}
         {success ? <div className="alert alert-success">{success}</div> : null}
 
-        <form className="add-products-form" onSubmit={handleSubmit}>
+        <form className="add-products-form" onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
             <div className="form-field">
-              <label className="form-label" htmlFor="p-name">Product Name</label>
+              <label className="form-label" htmlFor="p-name">
+                Product Name
+              </label>
               <input
                 id="p-name"
                 className="form-input"
@@ -162,7 +247,9 @@ const AddProducts = () => {
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="p-price">Price (RM)</label>
+              <label className="form-label" htmlFor="p-price">
+                Price (RM)
+              </label>
               <input
                 id="p-price"
                 className="form-input"
@@ -177,7 +264,9 @@ const AddProducts = () => {
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="p-qty">Quantity</label>
+              <label className="form-label" htmlFor="p-qty">
+                Quantity
+              </label>
               <input
                 id="p-qty"
                 className="form-input"
@@ -190,7 +279,9 @@ const AddProducts = () => {
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="product-image-input">Product Image</label>
+              <label className="form-label" htmlFor="product-image-input">
+                Product Image
+              </label>
               <input
                 id="product-image-input"
                 className="form-input"
@@ -199,7 +290,6 @@ const AddProducts = () => {
                 onChange={handleImageChange}
                 required
               />
-             
 
               {imagePreview ? (
                 <div className="image-preview-box">
@@ -209,7 +299,9 @@ const AddProducts = () => {
             </div>
 
             <div className="form-field form-field-full">
-              <label className="form-label" htmlFor="p-desc">Description</label>
+              <label className="form-label" htmlFor="p-desc">
+                Description
+              </label>
               <textarea
                 id="p-desc"
                 className="form-textarea"
@@ -230,7 +322,7 @@ const AddProducts = () => {
             <button
               className="btn-secondary"
               type="button"
-              onClick={resetForm}
+              onClick={() => resetForm()}
               disabled={submitting}
             >
               Reset
@@ -240,6 +332,4 @@ const AddProducts = () => {
       </div>
     </div>
   );
-};
-
-export default AddProducts;
+}

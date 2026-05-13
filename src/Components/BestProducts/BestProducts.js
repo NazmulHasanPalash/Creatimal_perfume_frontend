@@ -1,10 +1,22 @@
-// BestProducts.jsx
+// src/pages/BestProducts/BestProducts.jsx
 // @flow strict
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import './BestProducts.css';
 
 function BestProducts() {
+  const history = useHistory();
+
+  const goBuy = useCallback(
+    (productId) => {
+      const id = String(productId || '').trim();
+      if (!id) return;
+      history.push(`/buyProduct/${encodeURIComponent(id)}`);
+    },
+    [history]
+  );
+
   useEffect(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
@@ -69,7 +81,11 @@ function BestProducts() {
                   <span className="product-quantity">30 ml</span>
                   <span className="product-price">RM 60</span>
                 </div>
-                <button type="button" className="btn-buy-now">
+                <button
+                  type="button"
+                  className="btn-buy-now"
+                  onClick={() => goBuy('PRODUCT_ID_CONFIDENT')}
+                >
                   Buy Now
                 </button>
               </div>
@@ -96,7 +112,11 @@ function BestProducts() {
                   <span className="product-quantity">30 ml</span>
                   <span className="product-price">RM 60</span>
                 </div>
-                <button type="button" className="btn-buy-now">
+                <button
+                  type="button"
+                  className="btn-buy-now"
+                  onClick={() => goBuy('PRODUCT_ID_EXQUISITE')}
+                >
                   Buy Now
                 </button>
               </div>
@@ -123,7 +143,11 @@ function BestProducts() {
                   <span className="product-quantity">30 ml</span>
                   <span className="product-price">RM 60</span>
                 </div>
-                <button type="button" className="btn-buy-now">
+                <button
+                  type="button"
+                  className="btn-buy-now"
+                  onClick={() => goBuy('PRODUCT_ID_FRESH')}
+                >
                   Buy Now
                 </button>
               </div>
@@ -150,7 +174,11 @@ function BestProducts() {
                   <span className="product-quantity">30 ml</span>
                   <span className="product-price">RM 60</span>
                 </div>
-                <button type="button" className="btn-buy-now">
+                <button
+                  type="button"
+                  className="btn-buy-now"
+                  onClick={() => goBuy('PRODUCT_ID_PASSION')}
+                >
                   Buy Now
                 </button>
               </div>
@@ -177,7 +205,11 @@ function BestProducts() {
                   <span className="product-quantity">30 ml</span>
                   <span className="product-price">RM 60</span>
                 </div>
-                <button type="button" className="btn-buy-now">
+                <button
+                  type="button"
+                  className="btn-buy-now"
+                  onClick={() => goBuy('PRODUCT_ID_RELAX')}
+                >
                   Buy Now
                 </button>
               </div>
@@ -204,7 +236,11 @@ function BestProducts() {
                   <span className="product-quantity">30 ml</span>
                   <span className="product-price">RM 60</span>
                 </div>
-                <button type="button" className="btn-buy-now">
+                <button
+                  type="button"
+                  className="btn-buy-now"
+                  onClick={() => goBuy('PRODUCT_ID_STEADY')}
+                >
                   Buy Now
                 </button>
               </div>

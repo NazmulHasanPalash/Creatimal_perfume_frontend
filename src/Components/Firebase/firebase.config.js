@@ -1,11 +1,11 @@
 const firebaseConfig = {
-
-    apiKey: "AIzaSyBCRwTjCCnllIulLjGHyr-2JBM7dtQ_5mI",
-    authDomain: "cyber-security-6ebc1.firebaseapp.com",
-    projectId: "cyber-security-6ebc1",
-    storageBucket: "cyber-security-6ebc1.appspot.com",
-    messagingSenderId: "811200835843",
-    appId: "1:811200835843:web:322b39fbec4b07b08e3936"
-
+  apiKey: "AIzaSyBP2v6KkzZ-OPLS3ywTMynckvdCJyk1t8o",
+  authDomain: "creatimal-df4d1.firebaseapp.com",
+  projectId: "creatimal-df4d1",
+  storageBucket: "creatimal-df4d1.firebasestorage.app",
+  messagingSenderId: "512956096120",
+  appId: "1:512956096120:web:c5251a8a7919499fab178d",
+  measurementId: "G-TSWFK5TRFB"
 };
+
 export default firebaseConfig;

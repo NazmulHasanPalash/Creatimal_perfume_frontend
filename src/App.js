@@ -16,6 +16,10 @@ import Login from './page/Login/Login';
 import PrivateRouter from './Components/PrivateRouter/PrivateRouter';
 import BuyProducts from './page/BuyProducts/BuyProducts';
 import CustomerOrders from './page/CustomerOreders/CustomerOrders';
+import MyOrders from './page/MyOrders/MyOrders';
+import Admin from './page/Admin/Admin';
+import AdminRouter from './Components/AdminRouter/AdminRouter';
+import WhatsAppButton from './Components/WhatsAppButton/WhatsAppButton';
 
 
 function App() {
@@ -36,15 +40,22 @@ function App() {
             <Route exact path="/products">
               <Products></Products>
             </Route>
-             <Route exact path="/addProducts">
+             <AdminRouter exact path="/addProducts">
               <AddProduct></AddProduct>
-            </Route>
+            </AdminRouter>
              <PrivateRouter exact path="/buyProduct/:productId">
               <BuyProducts></BuyProducts>
             </PrivateRouter>
-            <PrivateRouter exact path="/customerOrders">
+            <AdminRouter exact path="/customerOrders">
               <CustomerOrders></CustomerOrders>
+            </AdminRouter>
+            <AdminRouter exact path="/admin">
+              <Admin></Admin>
+            </AdminRouter>
+            <PrivateRouter exact path="/myOrders">
+              <MyOrders></MyOrders>
             </PrivateRouter>
+            
 
             <Route exact path="/blog">
               <Blog></Blog>
@@ -65,6 +76,7 @@ function App() {
               <NotFound></NotFound>
             </Route>
           </Switch>
+          <WhatsAppButton></WhatsAppButton>
           <Footer></Footer>
         </BrowserRouter>
       </AuthProvider>

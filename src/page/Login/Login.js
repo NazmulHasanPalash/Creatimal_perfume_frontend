@@ -1,7 +1,7 @@
 // src/page/Login/Login.js
-// React Router v5 version (uses useHistory)
+// React Router DOM v5 (useHistory)
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -13,14 +13,14 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 
-// ✅ Import from your singleton initializer (src/firebase.init.js)
-import { auth, googleProvider } from '../../Components/Firebase/firebase.init';
-
-import './Login.css';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { auth, googleProvider } from '../../Components/Firebase/firebase.init';
+
+import './Login.css';
 
 const Login = () => {
   const [name, setName] = useState('');
@@ -30,78 +30,100 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false); // guard against double clicks
+  const [submitting, setSubmitting] = useState(false);
 
   // For linking Google -> password account flow
   const [pendingGoogleCred, setPendingGoogleCred] = useState(null); // AuthCredential | null
-  const [emailToLink, setEmailToLink] = useState(''); // email captured from Google error
+  const [emailToLink, setEmailToLink] = useState('');
 
   const location = useLocation();
   const history = useHistory();
+
+  // ✅ Prevent setState on unmounted component
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const safeSet = (fn) => {
+    if (isMountedRef.current) fn();
+  };
+
   const redirectUri =
-    (location.state &&
-      (location.state.from?.pathname || location.state.from)) ||
+    (location.state && (location.state.from?.pathname || location.state.from)) ||
     '/home';
 
-  // ---------- Google Login (with linking if email already exists) ----------
+  /* ---------------- Google Login ---------------- */
   const handleGoogleLogin = async () => {
     if (submitting) return;
-    try {
+
+    safeSet(() => {
       setSubmitting(true);
       setError('');
+    });
+
+    try {
       await signInWithPopup(auth, googleProvider);
       toast.success('Google Sign-In Successful 🎉');
       history.push(redirectUri);
     } catch (err) {
-      // If the email is already in use by a password user, ask the user to login with password once, then link Google.
+      // If the email is already used by email+password, do linking flow
       if (err?.code === 'auth/account-exists-with-different-credential') {
         const emailFromErr = err?.customData?.email || '';
         const cred = GoogleAuthProvider.credentialFromError(err);
 
-        setPendingGoogleCred(cred || null);
-        setEmail(emailFromErr);
-        setEmailToLink(emailFromErr);
-        setIsLogin(true); // switch to login view
+        safeSet(() => {
+          setPendingGoogleCred(cred || null);
+          setEmail(emailFromErr);
+          setEmailToLink(emailFromErr);
+          setIsLogin(true);
+        });
 
         const msg =
           'This email already has a password account. Please sign in with email & password to link Google.';
-        setError(msg);
+        safeSet(() => setError(msg));
         toast.info(msg);
         return;
       }
 
       const msg = err?.message || 'Google sign-in failed';
-      setError(msg);
+      safeSet(() => setError(msg));
       toast.error(msg);
     } finally {
-      setSubmitting(false);
+      safeSet(() => setSubmitting(false));
     }
   };
 
-  // ---------- Register / Login ----------
+  /* ---------------- Register/Login submit ---------------- */
   const handleRegistration = async (e) => {
     e.preventDefault();
     if (submitting) return;
 
-    // basic checks only for signup
+    // checks only for sign up
     if (!isLogin) {
       if (password.length < 8) {
         const msg = 'Password must be at least 8 characters long.';
-        setError(msg);
+        safeSet(() => setError(msg));
         toast.error(msg);
         return;
       }
       if (!/(?=.*[A-Z])/.test(password)) {
         const msg = 'Password must contain 1 uppercase letter.';
-        setError(msg);
+        safeSet(() => setError(msg));
         toast.error(msg);
         return;
       }
     }
 
-    try {
+    safeSet(() => {
       setSubmitting(true);
       setError('');
+    });
+
+    try {
       if (isLogin) {
         await processLogin(email, password);
       } else {
@@ -109,23 +131,23 @@ const Login = () => {
       }
     } catch (err) {
       const msg = err?.message || 'Authentication failed';
-      setError(msg);
+      safeSet(() => setError(msg));
       toast.error(msg);
     } finally {
-      setSubmitting(false);
+      safeSet(() => setSubmitting(false));
     }
   };
 
   const processLogin = async (emailArg, passwordArg) => {
     await signInWithEmailAndPassword(auth, emailArg, passwordArg);
-    setError('');
+    safeSet(() => setError(''));
 
-    // If we came from a Google popup that said "account exists", link now
+    // If we came from google "account exists" error, link now
     if (
       pendingGoogleCred &&
       auth.currentUser &&
       emailToLink &&
-      emailToLink.toLowerCase() === String(emailArg).toLowerCase()
+      String(emailToLink).toLowerCase() === String(emailArg).toLowerCase()
     ) {
       try {
         await linkWithCredential(auth.currentUser, pendingGoogleCred);
@@ -137,8 +159,10 @@ const Login = () => {
             : linkErr?.message || 'Failed to link Google'
         );
       } finally {
-        setPendingGoogleCred(null);
-        setEmailToLink('');
+        safeSet(() => {
+          setPendingGoogleCred(null);
+          setEmailToLink('');
+        });
       }
     }
 
@@ -148,45 +172,48 @@ const Login = () => {
 
   const registerNewUser = async (emailArg, passwordArg) => {
     await createUserWithEmailAndPassword(auth, emailArg, passwordArg);
-    setError('');
-    await setUserName();
-    await verifyEmail();
-    toast.success('Registration Successful 🎉 Please verify your email.');
-    setIsLogin(true);
-    history.push('/login'); // go to login after sign-up
-  };
 
-  const setUserName = async () => {
-    const displayName = name.trim();
+    // set display name (optional)
+    const displayName = String(name || '').trim();
     if (auth.currentUser && displayName) {
       await updateProfile(auth.currentUser, { displayName });
     }
-  };
 
-  const verifyEmail = async () => {
+    // verify email
     if (auth.currentUser) {
       await sendEmailVerification(auth.currentUser);
     }
+
+    safeSet(() => setError(''));
+    toast.success('Registration Successful 🎉 Please verify your email.');
+
+    safeSet(() => setIsLogin(true));
+    history.push('/login');
   };
 
-  // ---------- Reset Password ----------
+  /* ---------------- Reset Password ---------------- */
   const handleResetPassword = async () => {
     if (submitting) return;
+
     if (!email) {
       toast.info('Please enter your email.');
       return;
     }
-    try {
+
+    safeSet(() => {
       setSubmitting(true);
       setError('');
+    });
+
+    try {
       await sendPasswordResetEmail(auth, email);
       toast.info('Password reset email sent! Check your inbox.');
     } catch (err) {
       const msg = err?.message || 'Failed to send reset email';
-      setError(msg);
+      safeSet(() => setError(msg));
       toast.error(msg);
     } finally {
-      setSubmitting(false);
+      safeSet(() => setSubmitting(false));
     }
   };
 
@@ -206,7 +233,7 @@ const Login = () => {
                     Simplify your workflow in minutes.
                   </h6>
 
-                  {/* Name Field (Sign Up only) */}
+                  {/* Name (Sign Up only) */}
                   {!isLogin && (
                     <div className="mb-3">
                       <label htmlFor="inputName" className="form-label">
@@ -260,25 +287,17 @@ const Login = () => {
                         id="inputPassword3"
                         required
                         placeholder="Enter your password"
-                        autoComplete={
-                          isLogin ? 'current-password' : 'new-password'
-                        }
+                        autoComplete={isLogin ? 'current-password' : 'new-password'}
                         disabled={submitting}
                       />
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
                         onClick={() => setShowPassword((s) => !s)}
-                        aria-label={
-                          showPassword ? 'Hide password' : 'Show password'
-                        }
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
                         disabled={submitting}
                       >
-                        <i
-                          className={
-                            showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
-                          }
-                        />
+                        <i className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'} />
                       </button>
                     </div>
                   </div>
@@ -321,12 +340,9 @@ const Login = () => {
                     className="btn btn-style btn-primary p-2 w-75 my-3"
                     disabled={submitting}
                   >
-                    {submitting
-                      ? 'Please wait…'
-                      : isLogin
-                      ? 'Sign In'
-                      : 'Sign Up'}
+                    {submitting ? 'Please wait…' : isLogin ? 'Sign In' : 'Sign Up'}
                   </button>
+
                   <button
                     type="button"
                     onClick={handleResetPassword}
@@ -358,7 +374,7 @@ const Login = () => {
           {/* Image Section */}
           <div className="col-md-5 items-center">
             <img
-              src="image\perfume\p-1.png"
+              src="/image/perfume/p-1.png"
               className="img-fluid rounded-start"
               alt="cover"
               loading="lazy"
@@ -367,7 +383,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Toast Container */}
       <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
