@@ -1,4 +1,4 @@
-// src/pages/AddProducts/AddProducts.js  (React Router DOM v5 - FULL FIXED)
+// src/pages/AddProducts/AddProducts.js  (React Router DOM v5 - with Category)
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -6,6 +6,16 @@ import { useHistory } from 'react-router-dom';
 import './AddProducts.css';
 
 const API_BASE = 'https://creatimal-charmon-perfume-backend.vercel.app';
+
+/* ---------- category options ---------- */
+const CATEGORY_OPTIONS = [
+  { value: '', label: '— Select a category —', disabled: true },
+  { value: 'gift-ideas', label: 'Gift Ideas', disabled: false },
+  { value: 'vibrant', label: 'Vibrant', disabled: false },
+  { value: 'party-his', label: 'Party \u2013 His', disabled: false },
+  { value: 'party-her', label: 'Party \u2013 Her', disabled: false },
+  { value: 'oem-odm', label: 'OEM / ODM', disabled: false },
+];
 
 /* ---------- helpers ---------- */
 function safeStr(v) {
@@ -38,6 +48,7 @@ export default function AddProducts() {
 
   // form state
   const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('');
   const [description, setDescription] = useState('');
@@ -98,16 +109,18 @@ export default function AddProducts() {
       authReady &&
       !!safeStr(tokenRef.current).trim() &&
       name.trim() &&
+      category.trim() &&
       description.trim() &&
       safeStr(price).trim() &&
       safeStr(quantity).trim() &&
       !!imageFile &&
       !submitting
     );
-  }, [authReady, name, description, price, quantity, imageFile, submitting]);
+  }, [authReady, name, category, description, price, quantity, imageFile, submitting]);
 
   function resetForm({ keepMessages = false } = {}) {
     setName('');
+    setCategory('');
     setPrice('');
     setQuantity('');
     setDescription('');
@@ -136,7 +149,7 @@ export default function AddProducts() {
 
     // warning (not blocking)
     if (file.size > 512000) {
-      setError('Image is large. Use smaller image (recommended ≤ 500KB).');
+      setError('Image is large. Use smaller image (recommended \u2264 500KB).');
     }
 
     try {
@@ -161,6 +174,7 @@ export default function AddProducts() {
       const priceNum = Number(price);
 
       if (!name.trim()) return setError('Product name is required.');
+      if (!category.trim()) return setError('Please select a product category.');
       if (!description.trim()) return setError('Description is required.');
       if (!safeStr(quantity).trim()) return setError('Quantity is required (e.g., 30 ml).');
       if (!price || Number.isNaN(priceNum) || priceNum <= 0) {
@@ -174,6 +188,7 @@ export default function AddProducts() {
 
       const payload = {
         name: name.trim(),
+        category: category.trim(),
         description: description.trim(),
         quantity: safeStr(quantity).trim(),
         price: priceNum,
@@ -182,12 +197,9 @@ export default function AddProducts() {
 
       await api.post('/products', payload, { headers });
 
-      // ✅ show message + reset inputs (keep success)
-      setSuccess('✅ Product added successfully!');
+      setSuccess('\u2705 Product added successfully!');
       resetForm({ keepMessages: true });
 
-      // ✅ redirect to "/products" (HashRouter or BrowserRouter both OK)
-      // If you want a small delay so user sees success, keep setTimeout.
       setTimeout(() => {
         history.push('/products');
       }, 300);
@@ -222,7 +234,7 @@ export default function AddProducts() {
               ? userEmail
                 ? `Logged in: ${userEmail}`
                 : 'Not logged in'
-              : 'Checking login…'}
+              : 'Checking login\u2026'}
           </div>
         </header>
 
@@ -231,6 +243,8 @@ export default function AddProducts() {
 
         <form className="add-products-form" onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
+
+            {/* Product Name */}
             <div className="form-field">
               <label className="form-label" htmlFor="p-name">
                 Product Name
@@ -246,6 +260,31 @@ export default function AddProducts() {
               />
             </div>
 
+            {/* Category */}
+            <div className="form-field">
+              <label className="form-label" htmlFor="p-category">
+                Category
+              </label>
+              <select
+                id="p-category"
+                className="form-input form-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              >
+                {CATEGORY_OPTIONS.map((opt) => (
+                  <option
+                    key={opt.value}
+                    value={opt.value}
+                    disabled={opt.disabled}
+                  >
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price */}
             <div className="form-field">
               <label className="form-label" htmlFor="p-price">
                 Price (RM)
@@ -263,6 +302,7 @@ export default function AddProducts() {
               />
             </div>
 
+            {/* Quantity */}
             <div className="form-field">
               <label className="form-label" htmlFor="p-qty">
                 Quantity
@@ -278,6 +318,7 @@ export default function AddProducts() {
               />
             </div>
 
+            {/* Product Image */}
             <div className="form-field">
               <label className="form-label" htmlFor="product-image-input">
                 Product Image
@@ -298,6 +339,7 @@ export default function AddProducts() {
               ) : null}
             </div>
 
+            {/* Description */}
             <div className="form-field form-field-full">
               <label className="form-label" htmlFor="p-desc">
                 Description
@@ -312,6 +354,7 @@ export default function AddProducts() {
                 required
               />
             </div>
+
           </div>
 
           <div className="form-actions">

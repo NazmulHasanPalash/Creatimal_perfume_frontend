@@ -5,16 +5,12 @@
   min-height: 100vh;
   padding: 36px 18px;
 
-  background: radial-gradient(
-      1100px 520px at 16% 10%,
+  background: radial-gradient(1100px 520px at 16% 10%,
       rgba(249, 195, 187, 0.25),
-      transparent 60%
-    ),
-    radial-gradient(
-      900px 480px at 86% 18%,
+      transparent 60%),
+    radial-gradient(900px 480px at 86% 18%,
       rgba(0, 0, 0, 0.06),
-      transparent 60%
-    ),
+      transparent 60%),
     linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
 
   color: rgba(12, 18, 28, 0.92);
@@ -196,12 +192,10 @@
 /* Primary (luxury dark + pink accent) */
 .btn-primary {
   color: rgba(255, 255, 255, 0.95);
-  background: linear-gradient(
-    120deg,
-    rgba(12, 18, 28, 0.96) 0%,
-    rgba(50, 28, 26, 0.92) 45%,
-    rgba(12, 18, 28, 0.96) 100%
-  );
+  background: linear-gradient(120deg,
+      rgba(12, 18, 28, 0.96) 0%,
+      rgba(50, 28, 26, 0.92) 45%,
+      rgba(12, 18, 28, 0.96) 100%);
   box-shadow: 0 14px 40px rgba(12, 18, 28, 0.18);
 }
 
@@ -307,11 +301,9 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-      600px 260px at 20% 10%,
+  background: radial-gradient(600px 260px at 20% 10%,
       rgba(249, 195, 187, 0.28),
-      transparent 60%
-    ),
+      transparent 60%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.00), rgba(0, 0, 0, 0.10));
   pointer-events: none;
 }
@@ -373,12 +365,10 @@
   padding: 12px 14px;
   color: rgba(255, 255, 255, 0.95);
 
-  background: linear-gradient(
-    120deg,
-    rgba(12, 18, 28, 0.96) 0%,
-    rgba(50, 28, 26, 0.92) 45%,
-    rgba(12, 18, 28, 0.96) 100%
-  );
+  background: linear-gradient(120deg,
+      rgba(12, 18, 28, 0.96) 0%,
+      rgba(50, 28, 26, 0.92) 45%,
+      rgba(12, 18, 28, 0.96) 100%);
 
   box-shadow: 0 14px 40px rgba(12, 18, 28, 0.18);
 }
